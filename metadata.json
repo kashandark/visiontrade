@@ -1,0 +1,5 @@
+{
+  "name": "VisionTrade AI",
+  "description": "Real-time AI trading assistant that analyzes market charts via screen sharing to provide buy/sell signals.",
+  "requestFramePermissions": ["display-capture"]
+}
