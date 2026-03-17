@@ -1,4 +1,4 @@
-import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
+import { GoogleGenAI, GenerateContentResponse, ThinkingLevel } from "@google/genai";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
@@ -7,35 +7,39 @@ export interface TradeSignal {
   confidence: number;
   reasoning: string;
   trend: string;
+  entryPoint?: string;
+  stopLoss?: string;
+  takeProfit?: string;
 }
 
 export async function analyzeChart(base64Image: string): Promise<TradeSignal> {
   try {
     const response: GenerateContentResponse = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+      model: "gemini-3.1-pro-preview",
       contents: [
         {
           parts: [
             {
-              text: `You are a Professional Senior Quantitative Trader and Technical Analyst specializing in 1-minute (M1) binary options trading. 
-              
-              Your task is to analyze the provided chart image with extreme precision. 
-              
-              Follow this professional protocol:
-              1. CANDLESTICK ANALYSIS: Identify patterns (Engulfing, Pin Bars, Dojis, Marubozu). Look at the last 5-10 candles for momentum.
-              2. TREND IDENTIFICATION: Determine the micro-trend (Higher Highs/Lower Lows) and macro-trend.
-              3. SUPPORT & RESISTANCE: Identify immediate zones where price might bounce or break.
-              4. INDICATOR ESTIMATION: If visible, analyze RSI (overbought/oversold), MACD (crossovers), and Moving Averages.
-              5. VOLUME/VOLATILITY: Assess the size of candles relative to previous ones.
+              text: `SYSTEM ROLE: You are a Tier-1 Institutional Quantitative Strategist and Smart Money Concepts (SMC) Expert. Your objective is 100% precision in identifying high-probability reversals and continuations on M1 charts.
 
-              OUTPUT REQUIREMENTS:
-              - Return ONLY a JSON object.
-              - 'action': Must be 'BUY', 'SELL', or 'HOLD'. Be conservative; only suggest BUY/SELL if confidence > 75%.
-              - 'confidence': A realistic percentage (0-100) based on signal strength.
-              - 'trend': 'STRONGLY BULLISH', 'BULLISH', 'NEUTRAL', 'BEARISH', or 'STRONGLY BEARISH'.
-              - 'reasoning': A professional, concise technical summary (e.g., "Bearish engulfing at resistance zone with RSI divergence").
-              
-              Focus on high-probability setups for the next 1-3 minutes.`,
+SMC TRADING PROTOCOL:
+1. LIQUIDITY ANALYSIS: Identify 'Equal Highs/Lows' (Liquidity Pools). Look for 'Liquidity Sweeps' (wicks taking out previous highs/lows) before a move.
+2. MARKET STRUCTURE SHIFT (MSS): Only issue a BUY/SELL if a clear MSS has occurred (Break of Structure - BOS).
+3. FAIR VALUE GAPS (FVG): Identify imbalances in price delivery. Price often returns to fill these gaps.
+4. ORDER BLOCKS: Identify the last candle before a strong impulsive move. This is your high-probability entry zone.
+5. MULTI-TIMEFRAME CONTEXT: Even on M1, look for the 'Big Picture' trend visible in the zoom level.
+
+STRICT EXECUTION RULES:
+- Return ONLY a JSON object.
+- 'action': ONLY 'BUY' or 'SELL' if there is a 90%+ confluence of SMC factors. Otherwise, return 'HOLD'.
+- 'confidence': Be brutally honest. If the setup is 'B-grade', return 'HOLD'.
+- 'trend': 'STRONGLY BULLISH', 'BULLISH', 'NEUTRAL', 'BEARISH', or 'STRONGLY BEARISH'.
+- 'reasoning': Use professional SMC terminology (e.g., "Liquidity sweep of internal range liquidity followed by MSS and FVG fill").
+- 'entryPoint': Pinpoint the exact price level for entry.
+- 'stopLoss': Suggested safety level.
+- 'takeProfit': Target level for the 1-minute window.
+
+CRITICAL: You are analyzing a 'po.trade' (Pocket Option) chart. Ignore UI elements, focus ONLY on the price action candles.`,
             },
             {
               inlineData: {
@@ -60,7 +64,7 @@ export async function analyzeChart(base64Image: string): Promise<TradeSignal> {
     return {
       action: 'HOLD',
       confidence: 0,
-      reasoning: "Failed to analyze chart. Please ensure the chart is clearly visible.",
+      reasoning: "System recalibrating. Ensure the chart is stable and high-resolution.",
       trend: 'NEUTRAL'
     };
   }

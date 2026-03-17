@@ -55,7 +55,7 @@ export const TradingBot: React.FC = () => {
     if (!ctx) return null;
     
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    return canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
+    return canvas.toDataURL('image/jpeg', 1.0).split(',')[1];
   };
 
   useEffect(() => {
@@ -72,7 +72,7 @@ export const TradingBot: React.FC = () => {
           setSignal(result);
           setIsAnalyzing(false);
         }
-      }, 5000); // Analyze every 5 seconds for M1 timeframe
+      }, 10000); // Analyze every 10 seconds for higher precision
     }
     
     return () => clearInterval(interval);
@@ -84,10 +84,10 @@ export const TradingBot: React.FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <h1 className="text-3xl font-black tracking-tighter text-zinc-900 uppercase">VisionTrade Pro</h1>
-            <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded-md uppercase tracking-wider">Quant Edition</span>
+            <h1 className="text-3xl font-black tracking-tighter text-zinc-900 uppercase">VisionTrade Ultra</h1>
+            <span className="px-2 py-0.5 bg-zinc-900 text-white text-[10px] font-bold rounded-md uppercase tracking-wider">SMC Institutional</span>
           </div>
-          <p className="text-zinc-500 text-sm font-medium">Advanced Algorithmic Chart Analysis • M1 Precision</p>
+          <p className="text-zinc-500 text-sm font-medium">Smart Money Concepts • 3.1 Pro Precision Engine</p>
         </div>
         <div className="flex gap-3">
           {!isCapturing ? (
@@ -195,20 +195,21 @@ export const TradingBot: React.FC = () => {
                         <motion.div 
                           initial={{ width: 0 }}
                           animate={{ width: `${signal.confidence}%` }}
-                          className={`h-full ${signal.confidence > 80 ? 'bg-emerald-500' : 'bg-amber-500'}`}
+                          className={`h-full ${signal.confidence > 85 ? 'bg-emerald-500' : 'bg-amber-500'}`}
                         />
                       </div>
                     </div>
                     <div className="p-4 bg-zinc-50 rounded-2xl border border-zinc-100">
                       <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Market Bias</div>
-                      <div className="text-sm font-black text-zinc-900 uppercase truncate">{signal.trend}</div>
+                      <div className="text-sm font-black text-zinc-900 uppercase truncate">{signal.trend || 'NEUTRAL'}</div>
                       <div className="mt-2 flex gap-1">
                         {[1, 2, 3, 4, 5].map((i) => (
                           <div key={i} className={`h-1 flex-1 rounded-full ${
-                            (signal.trend.includes('BULLISH') && i <= 4) || 
-                            (signal.trend.includes('BEARISH') && i <= 4) ||
-                            (signal.trend === 'NEUTRAL' && i <= 2)
-                            ? (signal.trend.includes('BULLISH') ? 'bg-emerald-400' : signal.trend.includes('BEARISH') ? 'bg-rose-400' : 'bg-zinc-300')
+                            (signal.trend?.includes('BULLISH') && i <= 4) || 
+                            (signal.trend?.includes('BEARISH') && i <= 4) ||
+                            (signal.trend === 'NEUTRAL' && i <= 2) ||
+                            (!signal.trend && i <= 2)
+                            ? (signal.trend?.includes('BULLISH') ? 'bg-emerald-400' : signal.trend?.includes('BEARISH') ? 'bg-rose-400' : 'bg-zinc-300')
                             : 'bg-zinc-200'
                           }`} />
                         ))}
@@ -216,8 +217,31 @@ export const TradingBot: React.FC = () => {
                     </div>
                   </div>
 
+                  {signal.entryPoint && (
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-100 text-center">
+                        <div className="text-[8px] font-bold text-emerald-600 uppercase tracking-wider">Entry</div>
+                        <div className="text-xs font-black text-emerald-900">{signal.entryPoint}</div>
+                      </div>
+                      <div className="p-3 bg-rose-50 rounded-xl border border-rose-100 text-center">
+                        <div className="text-[8px] font-bold text-rose-600 uppercase tracking-wider">Stop</div>
+                        <div className="text-xs font-black text-rose-900">{signal.stopLoss}</div>
+                      </div>
+                      <div className="p-3 bg-blue-50 rounded-xl border border-blue-100 text-center">
+                        <div className="text-[8px] font-bold text-blue-600 uppercase tracking-wider">Target</div>
+                        <div className="text-xs font-black text-blue-900">{signal.takeProfit}</div>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="p-5 bg-zinc-900 rounded-2xl border border-zinc-800 shadow-inner">
-                    <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Technical Reasoning</div>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Institutional Reasoning</div>
+                      <div className="flex items-center gap-1">
+                        <div className="w-1 h-1 bg-emerald-400 rounded-full animate-pulse" />
+                        <span className="text-[8px] font-bold text-emerald-400 uppercase tracking-tighter">Deep Scan Active</span>
+                      </div>
+                    </div>
                     <p className="text-xs text-zinc-300 leading-relaxed font-medium">
                       {signal.reasoning}
                     </p>
