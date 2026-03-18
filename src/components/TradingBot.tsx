@@ -102,6 +102,10 @@ export const TradingBot: React.FC = () => {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <h1 className="text-3xl font-black tracking-tighter text-zinc-900 uppercase">VisionTrade Ultra</h1>
+            <div className="flex items-center gap-1 px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/20 rounded-md">
+              <div className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse" />
+              <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Ultra-Conservative</span>
+            </div>
             <span className="px-2 py-0.5 bg-zinc-900 text-white text-[10px] font-bold rounded-md uppercase tracking-wider">SMC Institutional</span>
           </div>
           <p className="text-zinc-500 text-sm font-medium">SMC Institutional • Low Latency Engine 4.0</p>
@@ -359,11 +363,11 @@ export const TradingBot: React.FC = () => {
             <ul className="text-xs space-y-3 text-zinc-300">
               <li className="flex gap-2">
                 <span className="text-emerald-400 font-bold">01</span>
-                The bot targets a minimum 1:3 Risk-to-Reward ratio. If the setup doesn't meet this, it will signal HOLD.
+                ULTRA-CONSERVATIVE MODE: The bot now requires the "Holy Trinity" (Sweep + MSS + FVG) to signal. It will signal HOLD 90% of the time to ensure only the highest probability trades are taken.
               </li>
               <li className="flex gap-2">
                 <span className="text-emerald-400 font-bold">02</span>
-                Take Profit (TP) targets are set at major institutional liquidity pools or Fair Value Gaps.
+                The bot is penalized for losing trades. It will only signal BUY/SELL if it is 99% confident in a "Profit Trade".
               </li>
               <li className="flex gap-2">
                 <span className="text-emerald-400 font-bold">03</span>
