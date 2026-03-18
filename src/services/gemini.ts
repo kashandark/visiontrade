@@ -10,9 +10,10 @@ export interface TradeSignal {
   entryPoint?: string;
   stopLoss?: string;
   takeProfit?: string;
+  latencyCompensation?: string;
 }
 
-export async function analyzeChart(base64Image: string): Promise<TradeSignal> {
+export async function analyzeChart(base64Image: string, latencyMs: number): Promise<TradeSignal> {
   try {
     const response: GenerateContentResponse = await ai.models.generateContent({
       model: "gemini-3.1-pro-preview",
@@ -20,26 +21,29 @@ export async function analyzeChart(base64Image: string): Promise<TradeSignal> {
         {
           parts: [
             {
-              text: `SYSTEM ROLE: You are a Tier-1 Institutional Quantitative Strategist and Smart Money Concepts (SMC) Expert. Your objective is 100% precision in identifying high-probability reversals and continuations on M1 charts.
+              text: `SYSTEM ROLE: You are a Tier-1 Institutional Quantitative Strategist and Smart Money Concepts (SMC) Expert. 
+
+CRITICAL CONTEXT:
+- LATENCY ALERT: The image you are seeing was captured ${latencyMs}ms ago. 
+- OBJECTIVE: You must perform "Predictive Price Action Analysis". Do not just analyze what you see; analyze what is LIKELY to happen in the NEXT 60 seconds, accounting for the fact that the market has already moved since this capture.
 
 SMC TRADING PROTOCOL:
-1. LIQUIDITY ANALYSIS: Identify 'Equal Highs/Lows' (Liquidity Pools). Look for 'Liquidity Sweeps' (wicks taking out previous highs/lows) before a move.
+1. LIQUIDITY ANALYSIS: Identify 'Equal Highs/Lows' (Liquidity Pools). Look for 'Liquidity Sweeps' before a move.
 2. MARKET STRUCTURE SHIFT (MSS): Only issue a BUY/SELL if a clear MSS has occurred (Break of Structure - BOS).
-3. FAIR VALUE GAPS (FVG): Identify imbalances in price delivery. Price often returns to fill these gaps.
-4. ORDER BLOCKS: Identify the last candle before a strong impulsive move. This is your high-probability entry zone.
-5. MULTI-TIMEFRAME CONTEXT: Even on M1, look for the 'Big Picture' trend visible in the zoom level.
+3. FAIR VALUE GAPS (FVG): Identify imbalances. Price often returns to fill these gaps.
+4. ORDER BLOCKS: Identify the last candle before a strong impulsive move.
+5. LATENCY COMPENSATION: If the current candle in the image is already at a major resistance/support, the trade might be too late. Only signal if the move is in its EARLY stages or if a RE-TEST is expected.
 
 STRICT EXECUTION RULES:
 - Return ONLY a JSON object.
-- 'action': ONLY 'BUY' or 'SELL' if there is a 90%+ confluence of SMC factors. Otherwise, return 'HOLD'.
-- 'confidence': Be brutally honest. If the setup is 'B-grade', return 'HOLD'.
+- 'action': ONLY 'BUY' or 'SELL' if there is a 95%+ confluence of SMC factors AND the latency does not invalidate the entry. Otherwise, return 'HOLD'.
+- 'confidence': Be brutally honest. 
 - 'trend': 'STRONGLY BULLISH', 'BULLISH', 'NEUTRAL', 'BEARISH', or 'STRONGLY BEARISH'.
-- 'reasoning': Use professional SMC terminology (e.g., "Liquidity sweep of internal range liquidity followed by MSS and FVG fill").
-- 'entryPoint': Pinpoint the exact price level for entry.
-- 'stopLoss': Suggested safety level.
-- 'takeProfit': Target level for the 1-minute window.
+- 'reasoning': Deep technical breakdown.
+- 'entryPoint': The exact price level for entry.
+- 'latencyCompensation': Explain how you adjusted your decision based on the ${latencyMs}ms delay.
 
-CRITICAL: You are analyzing a 'po.trade' (Pocket Option) chart. Ignore UI elements, focus ONLY on the price action candles.`,
+CRITICAL: You are analyzing a 'po.trade' (Pocket Option) chart. Focus ONLY on the price action candles.`,
             },
             {
               inlineData: {

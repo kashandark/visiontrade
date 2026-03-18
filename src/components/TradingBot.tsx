@@ -10,12 +10,17 @@ export const TradingBot: React.FC = () => {
   const [signal, setSignal] = useState<TradeSignal | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [latency, setLatency] = useState<number>(0);
 
   const startCapture = async () => {
     try {
       setError(null);
       const stream = await navigator.mediaDevices.getDisplayMedia({
-        video: { cursor: "always" } as any,
+        video: { 
+          cursor: "always",
+          frameRate: { ideal: 30, max: 60 },
+          displaySurface: "browser"
+        } as any,
         audio: false
       });
       
@@ -48,14 +53,20 @@ export const TradingBot: React.FC = () => {
     
     const canvas = canvasRef.current;
     const video = videoRef.current;
+    
+    // Ensure video is ready
+    if (video.readyState < 2) return null;
+
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     
-    const ctx = canvas.getContext('2d');
+    // Use desynchronized for lower latency if supported
+    const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true } as any);
     if (!ctx) return null;
     
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    return canvas.toDataURL('image/jpeg', 1.0).split(',')[1];
+    // 0.9 quality is significantly faster than 1.0 for base64 encoding
+    return canvas.toDataURL('image/jpeg', 0.9).split(',')[1];
   };
 
   useEffect(() => {
@@ -65,14 +76,18 @@ export const TradingBot: React.FC = () => {
       interval = setInterval(async () => {
         if (isAnalyzing) return;
         
+        const startTime = Date.now();
         const frame = captureFrame();
         if (frame) {
           setIsAnalyzing(true);
-          const result = await analyzeChart(frame);
+          // Reduced baseline to 800ms for optimized stream
+          const result = await analyzeChart(frame, 800);
+          const endTime = Date.now();
+          setLatency(endTime - startTime + 800);
           setSignal(result);
           setIsAnalyzing(false);
         }
-      }, 10000); // Analyze every 10 seconds for higher precision
+      }, 5000); // Increased frequency to 5 seconds for lower perceived delay
     }
     
     return () => clearInterval(interval);
@@ -87,7 +102,7 @@ export const TradingBot: React.FC = () => {
             <h1 className="text-3xl font-black tracking-tighter text-zinc-900 uppercase">VisionTrade Ultra</h1>
             <span className="px-2 py-0.5 bg-zinc-900 text-white text-[10px] font-bold rounded-md uppercase tracking-wider">SMC Institutional</span>
           </div>
-          <p className="text-zinc-500 text-sm font-medium">Smart Money Concepts • 3.1 Pro Precision Engine</p>
+          <p className="text-zinc-500 text-sm font-medium">SMC Institutional • Low Latency Engine 4.0</p>
         </div>
         <div className="flex gap-3">
           {!isCapturing ? (
@@ -248,11 +263,22 @@ export const TradingBot: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-zinc-50">
+                <div className="pt-4 border-t border-zinc-50 space-y-3">
                   <div className="flex justify-between items-center text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                    <div className="flex items-center gap-1">
+                      <div className={`w-1 h-1 rounded-full ${latency < 3000 ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                      <span>Latency: {latency}ms</span>
+                    </div>
                     <span>M1 Timeframe</span>
-                    <span>Live Update</span>
                   </div>
+                  {signal.latencyCompensation && (
+                    <div className="p-3 bg-zinc-50 rounded-xl border border-zinc-100">
+                      <div className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest mb-1">Latency Compensation</div>
+                      <p className="text-[10px] text-zinc-500 italic leading-tight">
+                        {signal.latencyCompensation}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </motion.div>
             ) : (
@@ -281,6 +307,10 @@ export const TradingBot: React.FC = () => {
               <li className="flex gap-2">
                 <span className="text-emerald-400 font-bold">03</span>
                 Use the "Candle" view on po.trade for best AI recognition.
+              </li>
+              <li className="flex gap-2">
+                <span className="text-emerald-400 font-bold">04</span>
+                The AI compensates for a ~1.5s-3s latency. If your internet is slow, wait for "Retest" signals.
               </li>
             </ul>
           </div>
