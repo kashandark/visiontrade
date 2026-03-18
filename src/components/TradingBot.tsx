@@ -57,16 +57,18 @@ export const TradingBot: React.FC = () => {
     // Ensure video is ready
     if (video.readyState < 2) return null;
 
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    // Maximize resolution for AI precision while keeping it manageable
+    const scale = Math.min(1, 1920 / video.videoWidth);
+    canvas.width = video.videoWidth * scale;
+    canvas.height = video.videoHeight * scale;
     
     // Use desynchronized for lower latency if supported
     const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true } as any);
     if (!ctx) return null;
     
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    // 0.9 quality is significantly faster than 1.0 for base64 encoding
-    return canvas.toDataURL('image/jpeg', 0.9).split(',')[1];
+    // 1.0 quality for maximum precision in candle identification
+    return canvas.toDataURL('image/jpeg', 1.0).split(',')[1];
   };
 
   useEffect(() => {
@@ -279,6 +281,17 @@ export const TradingBot: React.FC = () => {
                       </p>
                     </div>
                   )}
+
+                  {/* Institutional Reasoning */}
+                  <div className="p-4 bg-zinc-900 rounded-2xl border border-zinc-800">
+                    <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2 flex items-center gap-2">
+                      <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
+                      Institutional Reasoning
+                    </div>
+                    <p className="text-sm text-zinc-300 font-medium leading-relaxed">
+                      {signal.reasoning}
+                    </p>
+                  </div>
                 </div>
               </motion.div>
             ) : (

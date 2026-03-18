@@ -24,26 +24,27 @@ export async function analyzeChart(base64Image: string, latencyMs: number): Prom
               text: `SYSTEM ROLE: You are a Tier-1 Institutional Quantitative Strategist and Smart Money Concepts (SMC) Expert. 
 
 CRITICAL CONTEXT:
-- LATENCY ALERT: The image you are seeing was captured ${latencyMs}ms ago. 
-- OBJECTIVE: You must perform "Predictive Price Action Analysis". Do not just analyze what you see; analyze what is LIKELY to happen in the NEXT 60 seconds, accounting for the fact that the market has already moved since this capture.
+- PLATFORM: 'po.trade' (Pocket Option).
+- LATENCY ALERT: The image was captured ${latencyMs}ms ago.
+- OBJECTIVE: 100% precision. Only signal if a clear SMC setup exists.
 
-SMC TRADING PROTOCOL:
-1. LIQUIDITY ANALYSIS: Identify 'Equal Highs/Lows' (Liquidity Pools). Look for 'Liquidity Sweeps' before a move.
-2. MARKET STRUCTURE SHIFT (MSS): Only issue a BUY/SELL if a clear MSS has occurred (Break of Structure - BOS).
-3. FAIR VALUE GAPS (FVG): Identify imbalances. Price often returns to fill these gaps.
-4. ORDER BLOCKS: Identify the last candle before a strong impulsive move.
-5. LATENCY COMPENSATION: If the current candle in the image is already at a major resistance/support, the trade might be too late. Only signal if the move is in its EARLY stages or if a RE-TEST is expected.
+SMC TRADING PROTOCOL (VISUAL IDENTIFICATION):
+1. LIQUIDITY SWEEPS: Look for long wicks that take out previous swing highs/lows. This is the "Fuel" for the move.
+2. MARKET STRUCTURE SHIFT (MSS): A candle MUST close above/below the previous swing high/low (Break of Structure).
+3. FAIR VALUE GAPS (FVG): Identify 3-candle sequences where the 1st and 3rd candle wicks do not overlap.
+4. ORDER BLOCKS: The last opposite-colored candle before a strong impulsive move that breaks structure.
+5. NOISE FILTERING: IGNORE social trading icons (small profile pictures), trade history dots, and UI buttons. Focus ONLY on the candles and the price axis.
 
 STRICT EXECUTION RULES:
 - Return ONLY a JSON object.
 - 'action': ONLY 'BUY' or 'SELL' if there is a 95%+ confluence of SMC factors AND the latency does not invalidate the entry. Otherwise, return 'HOLD'.
 - 'confidence': Be brutally honest. 
 - 'trend': 'STRONGLY BULLISH', 'BULLISH', 'NEUTRAL', 'BEARISH', or 'STRONGLY BEARISH'.
-- 'reasoning': Deep technical breakdown.
+- 'reasoning': Explain the specific SMC setup (e.g., "Liquidity sweep of internal range liquidity followed by MSS and FVG fill").
 - 'entryPoint': The exact price level for entry.
 - 'latencyCompensation': Explain how you adjusted your decision based on the ${latencyMs}ms delay.
 
-CRITICAL: You are analyzing a 'po.trade' (Pocket Option) chart. Focus ONLY on the price action candles.`,
+CRITICAL: If the chart is too zoomed out or blurry, return 'HOLD' and ask for a better view.`,
             },
             {
               inlineData: {
@@ -62,7 +63,27 @@ CRITICAL: You are analyzing a 'po.trade' (Pocket Option) chart. Focus ONLY on th
     const text = response.text;
     if (!text) throw new Error("No response from AI");
     
-    return JSON.parse(text) as TradeSignal;
+    // Extract JSON from potential markdown blocks
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    const cleanJson = jsonMatch ? jsonMatch[0] : text;
+    
+    try {
+      const signal = JSON.parse(cleanJson) as TradeSignal;
+      // Ensure all required fields exist
+      return {
+        action: signal.action || 'HOLD',
+        confidence: signal.confidence || 0,
+        reasoning: signal.reasoning || "Analysis incomplete.",
+        trend: signal.trend || 'NEUTRAL',
+        entryPoint: signal.entryPoint,
+        stopLoss: signal.stopLoss,
+        takeProfit: signal.takeProfit,
+        latencyCompensation: signal.latencyCompensation
+      };
+    } catch (e) {
+      console.error("JSON Parse Error:", e, "Raw Text:", text);
+      throw new Error("Invalid AI response format");
+    }
   } catch (error) {
     console.error("AI Analysis Error:", error);
     return {
