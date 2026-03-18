@@ -11,6 +11,7 @@ export const TradingBot: React.FC = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [latency, setLatency] = useState<number>(0);
+  const [isPerfectionActive, setIsPerfectionActive] = useState(true);
 
   const startCapture = async () => {
     try {
@@ -106,6 +107,12 @@ export const TradingBot: React.FC = () => {
               <div className="w-1 h-1 bg-blue-500 rounded-full animate-pulse" />
               <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">HF Scalping Mode</span>
             </div>
+            {isPerfectionActive && (
+              <div className="flex items-center gap-1 px-2 py-0.5 bg-purple-500/10 border border-purple-500/20 rounded-md">
+                <div className="w-1 h-1 bg-purple-500 rounded-full animate-ping" />
+                <span className="text-[10px] font-bold text-purple-600 uppercase tracking-wider">Perfection Engine Active</span>
+              </div>
+            )}
             <span className="px-2 py-0.5 bg-zinc-900 text-white text-[10px] font-bold rounded-md uppercase tracking-wider">SMC Institutional</span>
           </div>
           <p className="text-zinc-500 text-sm font-medium">SMC Institutional • Low Latency Engine 4.0</p>
@@ -163,11 +170,17 @@ export const TradingBot: React.FC = () => {
                   
                   <div className="space-y-3">
                     <div className="p-3 bg-zinc-800/50 rounded-2xl border border-zinc-700/50">
-                      <div className="flex items-center gap-2 mb-1">
-                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                        <span className="text-[10px] font-bold text-zinc-400 uppercase">Entry</span>
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                          <span className="text-[10px] font-bold text-zinc-400 uppercase">Predicted Entry</span>
+                        </div>
+                        {signal.predictionConfidence && (
+                          <span className="text-[8px] font-bold text-purple-400 uppercase">Acc: {signal.predictionConfidence}%</span>
+                        )}
                       </div>
                       <div className="text-xl font-black text-white tracking-tight">{signal.entryPoint || '---'}</div>
+                      <div className="text-[8px] text-zinc-500 mt-1 italic">Compensated for {latency}ms delay</div>
                     </div>
                     
                     <div className="p-3 bg-zinc-800/50 rounded-2xl border border-zinc-700/50">

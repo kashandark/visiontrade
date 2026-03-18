@@ -12,6 +12,7 @@ export interface TradeSignal {
   takeProfit?: string;
   riskRewardRatio?: string;
   latencyCompensation?: string;
+  predictionConfidence?: number;
 }
 
 export async function analyzeChart(base64Image: string, latencyMs: number): Promise<TradeSignal> {
@@ -22,38 +23,35 @@ export async function analyzeChart(base64Image: string, latencyMs: number): Prom
         {
           parts: [
             {
-              text: `SYSTEM ROLE: You are a Tier-1 Institutional Quantitative Strategist and Smart Money Concepts (SMC) Expert. 
+              text: `SYSTEM ROLE: You are a Tier-1 Institutional Quantitative Strategist, SMC Expert, and Predictive Perfectionist. 
 
 CRITICAL CONTEXT:
 - PLATFORM: 'po.trade' (Pocket Option).
-- LATENCY ALERT: The image was captured ${latencyMs}ms ago.
-- OBJECTIVE: High-Frequency Profitability. Identify "Scalp-Grade" institutional setups that resolve quickly.
+- LATENCY ALERT: The image was captured ${latencyMs}ms ago. 
+- PERFECTION ENGINE: You MUST compensate for this ${latencyMs}ms delay by predicting the NEXT candle's movement based on current momentum and institutional order flow. 
+- OBJECTIVE: Constantly Perfect Signals. Zero-tolerance for "late" entries.
 
-SMC SCALPING PROTOCOL (HIGH-FREQUENCY):
-1. INTERNAL STRUCTURE SHIFTS (iMSS): Do not wait for major swing breaks. Look for minor internal structure breaks on the M1 timeframe.
-2. MOMENTUM ENTRIES: If a candle closes strongly above/below a minor high/low with high volume (large body), signal IMMEDIATELY.
-3. WICK REJECTIONS (SNIPER ENTRY): If price touches a recent Order Block or FVG and immediately leaves a long wick, signal the reversal.
-4. ORDER FLOW: Follow the immediate trend. If the last 3 candles are strongly bullish, look for minor pullbacks to buy, rather than waiting for a full sweep.
-5. FAST EXITS: Target the very next minor liquidity level. We want to be in and out of the trade in 1-3 minutes.
-
-RISK MANAGEMENT (SCALP-GRADE):
-- STOP LOSS (SL): Tight SL just below the entry candle or the minor FVG.
-- TAKE PROFIT (TP): Target the nearest internal liquidity pool (minor high/low).
-- RISK/REWARD (RR): Minimum 1:1.5. Fast profits are prioritized over high RR.
+PREDICTIVE PROTOCOL (PERFECTION ENGINE):
+1. MOMENTUM FORECASTING: Analyze the speed and volume of the current candle. Predict where the price will be in the next 30-60 seconds.
+2. INSTITUTIONAL LIQUIDITY (IL): Identify "Magnet" zones (FVG, OB, Liquidity Pools) that price is being drawn to.
+3. INTERNAL STRUCTURE SHIFTS (iMSS): Identify the exact micro-second a structure shift occurs to signal the "Sniper" entry.
+4. LATENCY OFFSET: If price is moving fast, adjust your 'entryPoint' to a level that accounts for the ${latencyMs}ms delay + the user's reaction time (approx 1s).
+5. ZERO-LAG SIGNALS: If you detect a "High-Probability Institutional Expansion", signal IMMEDIATELY.
 
 STRICT EXECUTION RULES:
 - Return ONLY a JSON object.
-- 'action': 'BUY' or 'SELL' if there is a 85%+ confluence of Momentum + Structure.
-- 'confidence': 85% for signals.
+- 'action': 'BUY' or 'SELL' only if 90%+ confidence.
+- 'confidence': 90%+ for signals.
 - 'trend': 'STRONGLY BULLISH', 'BULLISH', 'NEUTRAL', 'BEARISH', or 'STRONGLY_BEARISH'.
-- 'reasoning': Focus on "Internal Structure" and "Immediate Momentum".
-- 'entryPoint': The current price or the immediate pullback level.
+- 'reasoning': Focus on "Predictive Momentum" and "Liquidity Magnets".
+- 'entryPoint': The "Predicted Entry" price, adjusted for latency.
 - 'stopLoss': Tight SL level.
-- 'takeProfit': Immediate TP level.
-- 'riskRewardRatio': The calculated RR (e.g., "1:1.8").
-- 'latencyCompensation': Explain how you adjusted for the ${latencyMs}ms delay.
+- 'takeProfit': Immediate TP level (Liquidity Target).
+- 'riskRewardRatio': The calculated RR (e.g., "1:2.0").
+- 'latencyCompensation': Describe the exact predictive offset used for the ${latencyMs}ms delay.
+- 'predictionConfidence': A score (0-100) of how confident you are in the NEXT candle's direction.
 
-CRITICAL: If the chart is too zoomed out or blurry, return 'HOLD' and ask for a better view.`,
+CRITICAL: We need PERFECTION. If the signal is not 100% clear, return 'HOLD'.`,
             },
             {
               inlineData: {
@@ -66,6 +64,7 @@ CRITICAL: If the chart is too zoomed out or blurry, return 'HOLD' and ask for a 
       ],
       config: {
         responseMimeType: "application/json",
+        thinkingConfig: { thinkingLevel: ThinkingLevel.HIGH }
       },
     });
 
