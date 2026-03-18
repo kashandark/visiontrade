@@ -27,33 +27,30 @@ export async function analyzeChart(base64Image: string, latencyMs: number): Prom
 CRITICAL CONTEXT:
 - PLATFORM: 'po.trade' (Pocket Option).
 - LATENCY ALERT: The image was captured ${latencyMs}ms ago.
-- OBJECTIVE: 100% precision. Only signal if a "High-Probability Institutional Setup" exists. You are penalized for losing trades.
+- OBJECTIVE: High-Frequency Profitability. Identify "Scalp-Grade" institutional setups that resolve quickly.
 
-SMC TRADING PROTOCOL (ULTRA-CONSERVATIVE):
-1. THE "HOLY TRINITY" CONFLUENCE: You MUST see all three before signaling BUY/SELL:
-   - A: LIQUIDITY SWEEP (Long wick taking out a clear high/low).
-   - B: MARKET STRUCTURE SHIFT (MSS) with DISPLACEMENT (A strong, large-bodied candle breaking the structure).
-   - C: RETURN TO FVG/ORDER BLOCK (Price must pull back into the imbalance created by the MSS).
-2. DISPLACEMENT: If the move after the sweep is weak or "choppy", return 'HOLD'. We only trade explosive institutional moves.
-3. LIQUIDITY GRABS: If a candle sweeps a high and then closes back inside the range with a long upper wick, this is a BEARISH signal (Liquidity Grab). Do NOT buy into a liquidity grab.
-4. CONSOLIDATION FILTER: If price is moving sideways in a tight range with no clear expansion, return 'HOLD'.
-5. NOISE FILTERING: IGNORE all UI elements, trade markers, and social icons.
+SMC SCALPING PROTOCOL (HIGH-FREQUENCY):
+1. INTERNAL STRUCTURE SHIFTS (iMSS): Do not wait for major swing breaks. Look for minor internal structure breaks on the M1 timeframe.
+2. MOMENTUM ENTRIES: If a candle closes strongly above/below a minor high/low with high volume (large body), signal IMMEDIATELY.
+3. WICK REJECTIONS (SNIPER ENTRY): If price touches a recent Order Block or FVG and immediately leaves a long wick, signal the reversal.
+4. ORDER FLOW: Follow the immediate trend. If the last 3 candles are strongly bullish, look for minor pullbacks to buy, rather than waiting for a full sweep.
+5. FAST EXITS: Target the very next minor liquidity level. We want to be in and out of the trade in 1-3 minutes.
 
-RISK MANAGEMENT PROTOCOL:
-- STOP LOSS (SL): Place SL strictly at the swing high/low that swept the liquidity.
-- TAKE PROFIT (TP): Target the next major liquidity pool.
-- RISK/REWARD (RR): Minimum 1:3. If RR < 1:3, return 'HOLD'.
+RISK MANAGEMENT (SCALP-GRADE):
+- STOP LOSS (SL): Tight SL just below the entry candle or the minor FVG.
+- TAKE PROFIT (TP): Target the nearest internal liquidity pool (minor high/low).
+- RISK/REWARD (RR): Minimum 1:1.5. Fast profits are prioritized over high RR.
 
 STRICT EXECUTION RULES:
 - Return ONLY a JSON object.
-- 'action': ONLY 'BUY' or 'SELL' if there is a 99% confluence. If any part of the "Holy Trinity" is missing, return 'HOLD'.
-- 'confidence': 99% for signals, < 50% for HOLD.
-- 'trend': 'STRONGLY BULLISH', 'BULLISH', 'NEUTRAL', 'BEARISH', or 'STRONGLY BEARISH'.
-- 'reasoning': Explain how the "Holy Trinity" (Sweep + MSS + FVG) aligned.
-- 'entryPoint': The exact price level for entry (usually the FVG or Order Block).
-- 'stopLoss': The price level for SL.
-- 'takeProfit': The price level for TP.
-- 'riskRewardRatio': The calculated RR.
+- 'action': 'BUY' or 'SELL' if there is a 85%+ confluence of Momentum + Structure.
+- 'confidence': 85% for signals.
+- 'trend': 'STRONGLY BULLISH', 'BULLISH', 'NEUTRAL', 'BEARISH', or 'STRONGLY_BEARISH'.
+- 'reasoning': Focus on "Internal Structure" and "Immediate Momentum".
+- 'entryPoint': The current price or the immediate pullback level.
+- 'stopLoss': Tight SL level.
+- 'takeProfit': Immediate TP level.
+- 'riskRewardRatio': The calculated RR (e.g., "1:1.8").
 - 'latencyCompensation': Explain how you adjusted for the ${latencyMs}ms delay.
 
 CRITICAL: If the chart is too zoomed out or blurry, return 'HOLD' and ask for a better view.`,

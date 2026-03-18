@@ -102,9 +102,9 @@ export const TradingBot: React.FC = () => {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <h1 className="text-3xl font-black tracking-tighter text-zinc-900 uppercase">VisionTrade Ultra</h1>
-            <div className="flex items-center gap-1 px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/20 rounded-md">
-              <div className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse" />
-              <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Ultra-Conservative</span>
+            <div className="flex items-center gap-1 px-2 py-0.5 bg-blue-500/10 border border-blue-500/20 rounded-md">
+              <div className="w-1 h-1 bg-blue-500 rounded-full animate-pulse" />
+              <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">HF Scalping Mode</span>
             </div>
             <span className="px-2 py-0.5 bg-zinc-900 text-white text-[10px] font-bold rounded-md uppercase tracking-wider">SMC Institutional</span>
           </div>
@@ -362,12 +362,12 @@ export const TradingBot: React.FC = () => {
             <h4 className="font-bold text-sm uppercase tracking-wider text-zinc-400">Pro Tips</h4>
             <ul className="text-xs space-y-3 text-zinc-300">
               <li className="flex gap-2">
-                <span className="text-emerald-400 font-bold">01</span>
-                ULTRA-CONSERVATIVE MODE: The bot now requires the "Holy Trinity" (Sweep + MSS + FVG) to signal. It will signal HOLD 90% of the time to ensure only the highest probability trades are taken.
+                <span className="text-blue-400 font-bold">01</span>
+                HF SCALPING MODE: The bot now targets internal structure shifts (iMSS) for faster trade entries. Expect more frequent signals.
               </li>
               <li className="flex gap-2">
-                <span className="text-emerald-400 font-bold">02</span>
-                The bot is penalized for losing trades. It will only signal BUY/SELL if it is 99% confident in a "Profit Trade".
+                <span className="text-blue-400 font-bold">02</span>
+                MOMENTUM TRADING: If the bot detects a strong institutional expansion, it will signal a trade immediately to catch the move.
               </li>
               <li className="flex gap-2">
                 <span className="text-emerald-400 font-bold">03</span>
