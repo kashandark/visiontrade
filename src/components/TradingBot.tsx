@@ -234,23 +234,6 @@ export const TradingBot: React.FC = () => {
                     </div>
                   </div>
 
-                  {signal.entryPoint && (
-                    <div className="grid grid-cols-3 gap-2">
-                      <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-100 text-center">
-                        <div className="text-[8px] font-bold text-emerald-600 uppercase tracking-wider">Entry</div>
-                        <div className="text-xs font-black text-emerald-900">{signal.entryPoint}</div>
-                      </div>
-                      <div className="p-3 bg-rose-50 rounded-xl border border-rose-100 text-center">
-                        <div className="text-[8px] font-bold text-rose-600 uppercase tracking-wider">Stop</div>
-                        <div className="text-xs font-black text-rose-900">{signal.stopLoss}</div>
-                      </div>
-                      <div className="p-3 bg-blue-50 rounded-xl border border-blue-100 text-center">
-                        <div className="text-[8px] font-bold text-blue-600 uppercase tracking-wider">Target</div>
-                        <div className="text-xs font-black text-blue-900">{signal.takeProfit}</div>
-                      </div>
-                    </div>
-                  )}
-
                   <div className="p-5 bg-zinc-900 rounded-2xl border border-zinc-800 shadow-inner">
                     <div className="flex items-center justify-between mb-2">
                       <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Institutional Reasoning</div>
@@ -282,6 +265,64 @@ export const TradingBot: React.FC = () => {
                     </div>
                   )}
 
+                  {/* Risk Management */}
+                  <div className="p-4 bg-zinc-50 rounded-2xl border border-zinc-100">
+                    <div className="flex justify-between items-center mb-3">
+                      <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Risk Management</div>
+                      {signal.riskRewardRatio && (
+                        <div className="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded-md border border-emerald-200">
+                          RR {signal.riskRewardRatio}
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                          <span className="text-xs font-bold text-zinc-500 uppercase">Entry</span>
+                        </div>
+                        <span className="text-sm font-black text-zinc-900">{signal.entryPoint || '---'}</span>
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                          <span className="text-xs font-bold text-zinc-500 uppercase">Stop Loss</span>
+                        </div>
+                        <span className="text-sm font-black text-rose-600">{signal.stopLoss || '---'}</span>
+                      </div>
+                      
+                      <div className="flex items-center justify-between p-2 bg-emerald-50 rounded-xl border border-emerald-100">
+                        <div className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                          <span className="text-xs font-bold text-emerald-600 uppercase">Take Profit</span>
+                        </div>
+                        <span className="text-sm font-black text-emerald-700">{signal.takeProfit || '---'}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Market Structure Status */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="p-4 bg-zinc-50 rounded-2xl border border-zinc-100">
+                      <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Market Structure</div>
+                      <div className="flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full ${signal.trend?.includes('STRONGLY') ? 'bg-emerald-500 animate-pulse' : 'bg-emerald-400'}`} />
+                        <span className="text-xs font-black text-zinc-900 uppercase">{signal.trend || 'STABLE'}</span>
+                      </div>
+                    </div>
+                    <div className="p-4 bg-zinc-50 rounded-2xl border border-zinc-100">
+                      <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Liquidity Status</div>
+                      <div className="flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full ${signal.reasoning.toLowerCase().includes('sweep') || signal.reasoning.toLowerCase().includes('grab') ? 'bg-amber-500 animate-pulse' : 'bg-zinc-300'}`} />
+                        <span className="text-xs font-black text-zinc-900 uppercase">
+                          {signal.reasoning.toLowerCase().includes('sweep') || signal.reasoning.toLowerCase().includes('grab') ? 'GRAB DETECTED' : 'NEUTRAL'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Institutional Reasoning */}
                   <div className="p-4 bg-zinc-900 rounded-2xl border border-zinc-800">
                     <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2 flex items-center gap-2">
@@ -291,6 +332,13 @@ export const TradingBot: React.FC = () => {
                     <p className="text-sm text-zinc-300 font-medium leading-relaxed">
                       {signal.reasoning}
                     </p>
+                    {(signal.reasoning.toLowerCase().includes('liquidity grab') || 
+                      signal.reasoning.toLowerCase().includes('wick rejection')) && (
+                      <div className="mt-3 p-2 bg-rose-500/10 border border-rose-500/20 rounded-lg flex items-center gap-2">
+                        <AlertTriangle size={12} className="text-rose-500" />
+                        <span className="text-[10px] font-bold text-rose-500 uppercase tracking-tight">High Risk: Rejection Detected</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </motion.div>
@@ -311,19 +359,23 @@ export const TradingBot: React.FC = () => {
             <ul className="text-xs space-y-3 text-zinc-300">
               <li className="flex gap-2">
                 <span className="text-emerald-400 font-bold">01</span>
-                Keep the po.trade window active and clearly visible.
+                The bot targets a minimum 1:3 Risk-to-Reward ratio. If the setup doesn't meet this, it will signal HOLD.
               </li>
               <li className="flex gap-2">
                 <span className="text-emerald-400 font-bold">02</span>
-                Wait for confidence levels above 80% for better accuracy.
+                Take Profit (TP) targets are set at major institutional liquidity pools or Fair Value Gaps.
               </li>
               <li className="flex gap-2">
                 <span className="text-emerald-400 font-bold">03</span>
-                Use the "Candle" view on po.trade for best AI recognition.
+                The AI detects "Liquidity Grabs" (long wicks). If you see a "High Risk" warning, do not enter even if the signal is BUY/SELL.
               </li>
               <li className="flex gap-2">
                 <span className="text-emerald-400 font-bold">04</span>
-                The AI compensates for a ~1.5s-3s latency. If your internet is slow, wait for "Retest" signals.
+                Confidence levels above 90% are considered high-probability institutional setups.
+              </li>
+              <li className="flex gap-2">
+                <span className="text-emerald-400 font-bold">05</span>
+                The AI compensates for latency. If your internet is slow, wait for "Retest" signals.
               </li>
             </ul>
           </div>
