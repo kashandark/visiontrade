@@ -138,50 +138,126 @@ export const TradingBot: React.FC = () => {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Video Preview */}
-        <div className="lg:col-span-2 space-y-4">
-          <div className="relative aspect-video bg-zinc-100 rounded-2xl border-2 border-dashed border-zinc-200 overflow-hidden flex items-center justify-center">
-            {!isCapturing && (
-              <div className="text-center space-y-2">
-                <Camera className="mx-auto text-zinc-300" size={48} />
-                <p className="text-zinc-400 font-medium">Share your po.trade tab to begin</p>
-              </div>
-            )}
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              className={`w-full h-full object-contain ${isCapturing ? 'block' : 'hidden'}`}
-            />
-            <canvas ref={canvasRef} className="hidden" />
-            
-            {isAnalyzing && (
-              <div className="absolute inset-0 bg-white/40 backdrop-blur-[2px] flex items-center justify-center">
-                <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-lg border border-zinc-100">
-                  <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                  <span className="text-sm font-medium text-zinc-700">AI Analyzing...</span>
-                </div>
-              </div>
-            )}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        {/* HUD & Video Area */}
+        <div className="lg:col-span-3 flex flex-col md:flex-row gap-6">
+          {/* Left HUD Sidebar */}
+          <div className="w-full md:w-64 space-y-6">
+            {/* Risk Management HUD */}
+            <AnimatePresence>
+              {signal && (
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  className="p-5 bg-zinc-900 rounded-3xl border border-zinc-800 shadow-2xl space-y-4"
+                >
+                  <div className="flex justify-between items-center">
+                    <div className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em]">Risk HUD</div>
+                    {signal.riskRewardRatio && (
+                      <div className="px-2 py-0.5 bg-blue-500 text-white text-[10px] font-black rounded-md shadow-sm">
+                        RR {signal.riskRewardRatio}
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div className="p-3 bg-zinc-800/50 rounded-2xl border border-zinc-700/50">
+                      <div className="flex items-center gap-2 mb-1">
+                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                        <span className="text-[10px] font-bold text-zinc-400 uppercase">Entry</span>
+                      </div>
+                      <div className="text-xl font-black text-white tracking-tight">{signal.entryPoint || '---'}</div>
+                    </div>
+                    
+                    <div className="p-3 bg-zinc-800/50 rounded-2xl border border-zinc-700/50">
+                      <div className="flex items-center gap-2 mb-1">
+                        <div className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                        <span className="text-[10px] font-bold text-zinc-400 uppercase">Stop Loss</span>
+                      </div>
+                      <div className="text-xl font-black text-rose-400 tracking-tight">{signal.stopLoss || '---'}</div>
+                    </div>
+                    
+                    <div className="p-3 bg-emerald-500/10 rounded-2xl border border-emerald-500/20">
+                      <div className="flex items-center gap-2 mb-1">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                        <span className="text-[10px] font-bold text-emerald-400 uppercase">Take Profit</span>
+                      </div>
+                      <div className="text-xl font-black text-emerald-400 tracking-tight">{signal.takeProfit || '---'}</div>
+                    </div>
+                  </div>
+
+                  {/* Quick Stats */}
+                  <div className="pt-4 border-t border-zinc-800 grid grid-cols-2 gap-2">
+                    <div className="text-center">
+                      <div className="text-[8px] font-bold text-zinc-500 uppercase mb-1">Latency</div>
+                      <div className={`text-[10px] font-black ${latency < 3000 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                        {latency}ms
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-[8px] font-bold text-zinc-500 uppercase mb-1">TF</div>
+                      <div className="text-[10px] font-black text-zinc-300">M1</div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Security Audit in HUD */}
+            <section className="p-5 bg-amber-500/5 rounded-3xl border border-amber-500/10">
+              <h3 className="flex items-center gap-2 font-black text-[10px] text-amber-500 uppercase tracking-widest mb-3">
+                <AlertTriangle size={14} />
+                Risk Audit
+              </h3>
+              <ul className="text-[10px] text-amber-200/60 space-y-2 font-medium">
+                <li className="flex gap-2">
+                  <span className="text-amber-500">•</span>
+                  AI Assistant only.
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-amber-500">•</span>
+                  High capital risk.
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-amber-500">•</span>
+                  Verify all signals.
+                </li>
+              </ul>
+            </section>
           </div>
 
-          <section className="p-6 bg-amber-50 rounded-2xl border border-amber-100">
-            <h3 className="flex items-center gap-2 font-bold text-amber-900 mb-2">
-              <AlertTriangle size={18} />
-              Security & Risk Audit
-            </h3>
-            <ul className="text-sm text-amber-800 space-y-1 list-disc list-inside opacity-90">
-              <li>This AI is an assistant, not a financial advisor.</li>
-              <li>Trading binary options involves high risk of capital loss.</li>
-              <li>Latency in screen sharing can affect signal accuracy on M1.</li>
-              <li>Always verify signals with your own technical analysis.</li>
-            </ul>
-          </section>
+          {/* Video Preview */}
+          <div className="flex-1 space-y-4">
+            <div className="relative aspect-video bg-zinc-100 rounded-3xl border-2 border-dashed border-zinc-200 overflow-hidden flex items-center justify-center">
+              {!isCapturing && (
+                <div className="text-center space-y-2">
+                  <Camera className="mx-auto text-zinc-300" size={48} />
+                  <p className="text-zinc-400 font-medium">Share your po.trade tab to begin</p>
+                </div>
+              )}
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                className={`w-full h-full object-contain ${isCapturing ? 'block' : 'hidden'}`}
+              />
+              <canvas ref={canvasRef} className="hidden" />
+
+              {isAnalyzing && (
+                <div className="absolute inset-0 bg-white/40 backdrop-blur-[2px] flex items-center justify-center">
+                  <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-lg border border-zinc-100">
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                    <span className="text-sm font-medium text-zinc-700">AI Analyzing...</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Signal Panel */}
-        <div className="space-y-6">
+        <div className="lg:col-span-1 space-y-6">
           <AnimatePresence mode="wait">
             {signal ? (
               <motion.div
@@ -268,44 +344,6 @@ export const TradingBot: React.FC = () => {
                       </p>
                     </div>
                   )}
-
-                  {/* Risk Management */}
-                  <div className="p-4 bg-zinc-50 rounded-2xl border border-zinc-100">
-                    <div className="flex justify-between items-center mb-3">
-                      <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Risk Management</div>
-                      {signal.riskRewardRatio && (
-                        <div className="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded-md border border-emerald-200">
-                          RR {signal.riskRewardRatio}
-                        </div>
-                      )}
-                    </div>
-                    
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                          <span className="text-xs font-bold text-zinc-500 uppercase">Entry</span>
-                        </div>
-                        <span className="text-sm font-black text-zinc-900">{signal.entryPoint || '---'}</span>
-                      </div>
-                      
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-                          <span className="text-xs font-bold text-zinc-500 uppercase">Stop Loss</span>
-                        </div>
-                        <span className="text-sm font-black text-rose-600">{signal.stopLoss || '---'}</span>
-                      </div>
-                      
-                      <div className="flex items-center justify-between p-2 bg-emerald-50 rounded-xl border border-emerald-100">
-                        <div className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                          <span className="text-xs font-bold text-emerald-600 uppercase">Take Profit</span>
-                        </div>
-                        <span className="text-sm font-black text-emerald-700">{signal.takeProfit || '---'}</span>
-                      </div>
-                    </div>
-                  </div>
 
                   {/* Market Structure Status */}
                   <div className="grid grid-cols-2 gap-3">
