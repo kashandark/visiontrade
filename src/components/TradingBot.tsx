@@ -201,16 +201,36 @@ export const TradingBot: React.FC = () => {
                   </div>
 
                   {/* Quick Stats */}
-                  <div className="pt-4 border-t border-zinc-800 grid grid-cols-2 gap-2">
-                    <div className="text-center">
-                      <div className="text-[8px] font-bold text-zinc-500 uppercase mb-1">Latency</div>
-                      <div className={`text-[10px] font-black ${latency < 3000 ? 'text-emerald-400' : 'text-amber-400'}`}>
-                        {latency}ms
+                  <div className="pt-4 border-t border-zinc-800 space-y-4">
+                    {signal.confluenceScore !== undefined && (
+                      <div className="space-y-1">
+                        <div className="flex justify-between items-center text-[8px] font-bold text-zinc-500 uppercase">
+                          <span>Confluence Meter</span>
+                          <span className={signal.confluenceScore >= 95 ? 'text-emerald-400' : 'text-amber-400'}>
+                            {signal.confluenceScore}%
+                          </span>
+                        </div>
+                        <div className="w-full h-1 bg-zinc-800 rounded-full overflow-hidden">
+                          <motion.div 
+                            initial={{ width: 0 }}
+                            animate={{ width: `${signal.confluenceScore}%` }}
+                            className={`h-full ${signal.confluenceScore >= 95 ? 'bg-emerald-500' : 'bg-amber-500'}`}
+                          />
+                        </div>
                       </div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-[8px] font-bold text-zinc-500 uppercase mb-1">TF</div>
-                      <div className="text-[10px] font-black text-zinc-300">M1</div>
+                    )}
+                    
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="text-center">
+                        <div className="text-[8px] font-bold text-zinc-500 uppercase mb-1">Latency</div>
+                        <div className={`text-[10px] font-black ${latency < 3000 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                          {latency}ms
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-[8px] font-bold text-zinc-500 uppercase mb-1">Efficiency</div>
+                        <div className="text-[10px] font-black text-purple-400">100%</div>
+                      </div>
                     </div>
                   </div>
                 </motion.div>

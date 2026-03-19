@@ -13,6 +13,7 @@ export interface TradeSignal {
   riskRewardRatio?: string;
   latencyCompensation?: string;
   predictionConfidence?: number;
+  confluenceScore?: number;
 }
 
 export async function analyzeChart(base64Image: string, latencyMs: number): Promise<TradeSignal> {
@@ -29,21 +30,27 @@ CRITICAL CONTEXT:
 - PLATFORM: 'po.trade' (Pocket Option).
 - LATENCY ALERT: The image was captured ${latencyMs}ms ago. 
 - PERFECTION ENGINE: You MUST compensate for this ${latencyMs}ms delay by predicting the NEXT candle's movement based on current momentum and institutional order flow. 
-- OBJECTIVE: Constantly Perfect Signals. Zero-tolerance for "late" entries.
+- OBJECTIVE: 100% Profitable Confluence. Zero-tolerance for "noise" or "low-probability" trades.
+
+SURGICAL CONFLUENCE CHECKLIST (MUST PASS ALL):
+1. HTF ALIGNMENT: Is the immediate trend (last 10-20 candles) strongly in the direction of the trade?
+2. LIQUIDITY SWEEP: Has price recently swept a minor high/low to grab liquidity before the move?
+3. iMSS (Internal Market Structure Shift): Is there a clear break of the most recent internal structure?
+4. FVG/ORDER BLOCK: Is the 'entryPoint' at a Fair Value Gap or a mitigated Order Block?
+5. MOMENTUM: Is the current candle showing "Institutional Expansion" (large body, small wicks)?
 
 PREDICTIVE PROTOCOL (PERFECTION ENGINE):
-1. MOMENTUM FORECASTING: Analyze the speed and volume of the current candle. Predict where the price will be in the next 30-60 seconds.
-2. INSTITUTIONAL LIQUIDITY (IL): Identify "Magnet" zones (FVG, OB, Liquidity Pools) that price is being drawn to.
-3. INTERNAL STRUCTURE SHIFTS (iMSS): Identify the exact micro-second a structure shift occurs to signal the "Sniper" entry.
-4. LATENCY OFFSET: If price is moving fast, adjust your 'entryPoint' to a level that accounts for the ${latencyMs}ms delay + the user's reaction time (approx 1s).
-5. ZERO-LAG SIGNALS: If you detect a "High-Probability Institutional Expansion", signal IMMEDIATELY.
+1. MOMENTUM FORECASTING: Analyze the speed and volume. Predict where the price will be in the next 30-60 seconds.
+2. LATENCY OFFSET: Adjust 'entryPoint' to account for the ${latencyMs}ms delay + 1s user reaction time.
+3. ZERO-LAG SIGNALS: Signal ONLY at the start of an expansion, never at the end.
 
 STRICT EXECUTION RULES:
 - Return ONLY a JSON object.
-- 'action': 'BUY' or 'SELL' only if 90%+ confidence.
-- 'confidence': 90%+ for signals.
+- 'action': 'BUY' or 'SELL' ONLY if confluenceScore is 95%+.
+- 'confidence': 95%+ for signals.
+- 'confluenceScore': Calculate based on the checklist (0-100).
 - 'trend': 'STRONGLY BULLISH', 'BULLISH', 'NEUTRAL', 'BEARISH', or 'STRONGLY_BEARISH'.
-- 'reasoning': Focus on "Predictive Momentum" and "Liquidity Magnets".
+- 'reasoning': Focus on "Surgical Confluence" and "Institutional Order Flow".
 - 'entryPoint': The "Predicted Entry" price, adjusted for latency.
 - 'stopLoss': Tight SL level.
 - 'takeProfit': Immediate TP level (Liquidity Target).
@@ -51,7 +58,7 @@ STRICT EXECUTION RULES:
 - 'latencyCompensation': Describe the exact predictive offset used for the ${latencyMs}ms delay.
 - 'predictionConfidence': A score (0-100) of how confident you are in the NEXT candle's direction.
 
-CRITICAL: We need PERFECTION. If the signal is not 100% clear, return 'HOLD'.`,
+CRITICAL: We need 100% PERFECTION. If any checklist item fails, return 'HOLD'.`,
             },
             {
               inlineData: {
@@ -87,7 +94,9 @@ CRITICAL: We need PERFECTION. If the signal is not 100% clear, return 'HOLD'.`,
         stopLoss: signal.stopLoss,
         takeProfit: signal.takeProfit,
         riskRewardRatio: signal.riskRewardRatio,
-        latencyCompensation: signal.latencyCompensation
+        latencyCompensation: signal.latencyCompensation,
+        predictionConfidence: signal.predictionConfidence,
+        confluenceScore: signal.confluenceScore
       };
     } catch (e) {
       console.error("JSON Parse Error:", e, "Raw Text:", text);
